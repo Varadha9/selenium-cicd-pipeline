@@ -14,16 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+          java-version: "11"
+          distribution: "temurin"
 
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@v1
 
-      - name: Run Selenium tests
-        run: python -m unittest discover -s tests -v
+      - name: Run Selenium Tests
+        run: mvn test -B
