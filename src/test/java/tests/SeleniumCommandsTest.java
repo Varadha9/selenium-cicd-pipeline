@@ -188,37 +188,38 @@ public class SeleniumCommandsTest {
     @Test
     @Order(3)
     void testElementInteraction() {
-        driver.get("https://www.google.com");
+        // Use DuckDuckGo instead of Google — no consent popup, search box always available
+        // Google sometimes shows a cookie/consent page that blocks the search box
+        driver.get("https://duckduckgo.com");
 
-        // driver.findElement(By.name()): locates an element using its HTML 'name' attribute
-        // Returns the first matching WebElement on the page
-        WebElement searchBox = driver.findElement(By.name("q"));
+        // Explicit wait: waits until the search box is visible before interacting
+        // This prevents NoSuchElementException if the page hasn't fully loaded yet
+        WebElement searchBox = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.name("q"))
+        );
 
         // element.sendKeys(): simulates typing text into an input field
-        // Used to enter text into search boxes, forms, etc.
         searchBox.sendKeys("Selenium WebDriver");
 
-        // element.getAttribute("value"): retrieves the current value of an input field
-        // We verify the text was typed correctly
+        // element.getAttribute("value"): retrieves the current typed value of the input field
         assertEquals("Selenium WebDriver", searchBox.getAttribute("value"));
 
-        // element.clear(): clears all text from an input field
-        // Used to reset a field before entering new text
+        // element.clear(): clears all text from the input field
         searchBox.clear();
 
-        // driver.findElement(By.cssSelector()): locates an element using a CSS selector
-        // More flexible than By.name() — can target elements by attribute, class, ID, etc.
-        WebElement searchBoxCss = driver.findElement(By.cssSelector("input[name='q']"));
+        // driver.findElement(By.cssSelector()): locates element using CSS selector syntax
+        // input[name='q'] targets an input element whose name attribute equals 'q'
+        WebElement searchBoxCss = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[name='q']"))
+        );
 
         // Type a new search query
         searchBoxCss.sendKeys("Java Selenium");
 
-        // Keys.ENTER: simulates pressing the Enter key on the keyboard
-        // Used to submit a search or form without clicking a button
+        // Keys.ENTER: simulates pressing the Enter key to submit the search
         searchBoxCss.sendKeys(Keys.ENTER);
 
-        // Explicit wait: waits until the page title contains "Java Selenium"
-        // This ensures the search results page has loaded before we assert
+        // Explicit wait: waits until the results page title contains "Java Selenium"
         wait.until(ExpectedConditions.titleContains("Java Selenium"));
         assertTrue(driver.getTitle().contains("Java Selenium"));
 
@@ -266,13 +267,17 @@ public class SeleniumCommandsTest {
     @Test
     @Order(5)
     void testKeyboardMouseActions() {
-        driver.get("https://www.google.com");
+        // Use DuckDuckGo — no consent popup, search box reliably available
+        driver.get("https://duckduckgo.com");
 
         // Actions class: used for complex user interactions that go beyond simple click/type
         // Examples: hover, drag-and-drop, right-click, key combinations
         Actions actions = new Actions(driver);
 
-        WebElement searchBox = driver.findElement(By.name("q"));
+        // Wait for search box to be visible before interacting
+        WebElement searchBox = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.name("q"))
+        );
 
         // actions.moveToElement(): moves the mouse cursor to the center of the element
         // Used to trigger hover effects or ensure the element is in focus before interacting
