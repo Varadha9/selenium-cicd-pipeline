@@ -45,9 +45,18 @@ public class SeleniumCommandsTest {
         // ChromeOptions: used to customize Chrome browser behavior before launching
         ChromeOptions options = new ChromeOptions();
 
-        // --start-maximized: opens the browser in full screen so tests are visible
-        // We do NOT use --headless here so the browser opens visually like IntelliJ runs
+        // --start-maximized: opens the browser in full screen so tests are visible locally
         options.addArguments("--start-maximized");
+
+        // CI environment (GitHub Actions) has no display — Chrome must run headless
+        // These flags are required for Chrome to start on Ubuntu cloud runners
+        if (System.getenv("CI") != null) {
+            options.addArguments("--headless=new");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--window-size=1920,1080");
+        }
 
         // Launch Chrome browser with the configured options
         driver = new ChromeDriver(options);
