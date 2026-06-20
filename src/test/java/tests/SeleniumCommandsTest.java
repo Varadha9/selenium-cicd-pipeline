@@ -4,8 +4,9 @@ package tests;
 // so we don't need to manually download chromedriver.exe
 import io.github.bonigarcia.wdm.WebDriverManager;
 
-// JUnit 5 annotations for test lifecycle and ordering
-import org.junit.jupiter.api.*;
+// TestNG annotations for test lifecycle and ordering
+import org.testng.annotations.*;
+import org.testng.Assert;
 
 // Core Selenium imports
 import org.openqa.selenium.*;                          // WebDriver, By, Keys, Cookie, etc.
@@ -25,25 +26,18 @@ import java.time.Duration;
 // Set: used to store multiple window handles (each open tab/window has a unique handle)
 import java.util.Set;
 
-// JUnit assertion methods: used to verify expected vs actual values in tests
-import static org.junit.jupiter.api.Assertions.*;
-
-// @TestMethodOrder: ensures tests run in the defined @Order sequence
-// This is important because some tests depend on browser state from previous tests
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SeleniumCommandsTest {
 
     // WebDriver: the main interface to control the browser
-    // Declared static so it is shared across all test methods in this class
-    static WebDriver driver;
+    WebDriver driver;
 
     // WebDriverWait: used for explicit waits — waits until a condition is true or timeout occurs
     // More reliable than Thread.sleep() because it polls dynamically
-    static WebDriverWait wait;
+    WebDriverWait wait;
 
-    // @BeforeAll: runs ONCE before all tests — used to initialize the browser
-    @BeforeAll
-    static void setup() {
+    // @BeforeSuite: runs ONCE before all tests — used to initialize the browser
+    @BeforeSuite
+    public void setup() {
         // WebDriverManager automatically downloads the correct ChromeDriver version
         // matching the installed Chrome browser — no manual setup needed
         WebDriverManager.chromedriver().setup();
@@ -71,9 +65,9 @@ public class SeleniumCommandsTest {
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
     }
 
-    // @AfterAll: runs ONCE after all tests — used to close the browser and end the session
-    @AfterAll
-    static void teardown() {
+    // @AfterSuite: runs ONCE after all tests — used to close the browser and end the session
+    @AfterSuite
+    public void teardown() {
         // driver.quit(): closes ALL open browser windows and ends the WebDriver session
         // Always call quit() instead of close() at the end to free up resources
         driver.quit();
@@ -83,21 +77,20 @@ public class SeleniumCommandsTest {
     // TEST 1: Browser & Navigation Commands
     // Purpose: Verify basic browser navigation — opening URLs, going back/forward, refresh
     // ─────────────────────────────────────────────────────────────────────────────
-    @Test
-    @Order(1) // Runs first
-    void testBrowserNavigation() {
+    @Test(priority = 1)
+    public void testBrowserNavigation() {
 
         // driver.get(): opens the specified URL in the current browser window
         // This is the most basic browser command — equivalent to typing a URL in the address bar
-        driver.get("https://www.example.com");
+        driver.get("https://github.com");
 
         // driver.getTitle(): returns the title of the current page (text in the browser tab)
-        // We use assertEquals to verify the page loaded correctly
-        assertEquals("Example Domain", driver.getTitle());
+        // We use assertTrue to verify the page loaded correctly
+        Assert.assertTrue(driver.getTitle().contains("GitHub"));
 
         // driver.getCurrentUrl(): returns the full URL of the current page
         // Useful to verify redirects or that the correct page is loaded
-        assertEquals("https://www.example.com/", driver.getCurrentUrl());
+        Assert.assertTrue(driver.getCurrentUrl().contains("github.com"));
 
         // driver.navigate().to(): navigates to a new URL — similar to driver.get()
         // The difference: navigate().to() is part of the Navigation interface and supports history
@@ -122,10 +115,9 @@ public class SeleniumCommandsTest {
     // TEST 2: Window Management Commands
     // Purpose: Demonstrate how to manage browser windows and tabs
     // ─────────────────────────────────────────────────────────────────────────────
-    @Test
-    @Order(2)
-    void testWindowManagement() {
-        driver.get("https://www.example.com");
+    @Test(priority = 2)
+    public void testWindowManagement() {
+        driver.get("https://www.selenium.dev");
 
         // driver.manage().window().maximize(): maximizes the browser window to fill the screen
         // Used to ensure elements are visible and not hidden due to small window size
@@ -134,7 +126,7 @@ public class SeleniumCommandsTest {
         // driver.manage().window().getSize(): returns the current window size as a Dimension object
         // We verify the width is greater than 0 to confirm the window is open
         Dimension size = driver.manage().window().getSize();
-        assertTrue(size.getWidth() > 0);
+        Assert.assertTrue(size.getWidth() > 0);
 
         // driver.manage().window().setSize(): sets the browser window to a specific width x height
         // Useful for testing responsive layouts at different screen resolutions
@@ -153,7 +145,7 @@ public class SeleniumCommandsTest {
         driver.switchTo().newWindow(WindowType.TAB);
 
         // Open a different website in the new tab (child window)
-        driver.get("https://www.wikipedia.org");
+        driver.get("https://www.bing.com");
 
         // driver.getWindowHandles(): returns a Set of all open window/tab handles
         // We use this to find the child window handle
@@ -185,9 +177,8 @@ public class SeleniumCommandsTest {
     // TEST 3: Element Interaction Commands
     // Purpose: Find elements on the page and interact with them (type, click, clear)
     // ─────────────────────────────────────────────────────────────────────────────
-    @Test
-    @Order(3)
-    void testElementInteraction() {
+    @Test(priority = 3)
+    public void testElementInteraction() {
         // Use DuckDuckGo instead of Google — no consent popup, search box always available
         // Google sometimes shows a cookie/consent page that blocks the search box
         driver.get("https://duckduckgo.com");
@@ -202,7 +193,7 @@ public class SeleniumCommandsTest {
         searchBox.sendKeys("Selenium WebDriver");
 
         // element.getAttribute("value"): retrieves the current typed value of the input field
-        assertEquals("Selenium WebDriver", searchBox.getAttribute("value"));
+        Assert.assertEquals(searchBox.getAttribute("value"), "Selenium WebDriver");
 
         // element.clear(): clears all text from the input field
         searchBox.clear();
@@ -221,7 +212,7 @@ public class SeleniumCommandsTest {
 
         // Explicit wait: waits until the results page title contains "Java Selenium"
         wait.until(ExpectedConditions.titleContains("Java Selenium"));
-        assertTrue(driver.getTitle().contains("Java Selenium"));
+        Assert.assertTrue(driver.getTitle().contains("Java Selenium"));
 
         System.out.println("✅ Element Interaction Commands passed");
     }
@@ -230,10 +221,9 @@ public class SeleniumCommandsTest {
     // TEST 4: Wait Commands
     // Purpose: Demonstrate implicit and explicit waits to handle dynamic page content
     // ─────────────────────────────────────────────────────────────────────────────
-    @Test
-    @Order(4)
-    void testWaitCommands() {
-        driver.get("https://www.example.com");
+    @Test(priority = 4)
+    public void testWaitCommands() {
+        driver.get("https://quotes.toscrape.com");
 
         // ExpectedConditions.visibilityOfElementLocated(): waits until the element is visible in the DOM
         // Used when elements load dynamically (e.g., after AJAX calls or animations)
@@ -244,18 +234,18 @@ public class SeleniumCommandsTest {
 
         // element.isDisplayed(): returns true if the element is visible on the page
         // Used to verify an element is actually shown to the user
-        assertTrue(heading.isDisplayed());
+        Assert.assertTrue(heading.isDisplayed());
 
         // ExpectedConditions.elementToBeClickable(): waits until the element is visible AND enabled
         // Used before clicking buttons or links to avoid ElementNotInteractableException
         WebElement link = wait.until(
             ExpectedConditions.elementToBeClickable(By.tagName("a"))
         );
-        assertNotNull(link);
+        Assert.assertNotNull(link);
 
-        // ExpectedConditions.titleIs(): waits until the page title exactly matches the given string
+        // ExpectedConditions.titleContains(): waits until the page title contains the given string
         // Useful to confirm navigation to the correct page
-        wait.until(ExpectedConditions.titleIs("Example Domain"));
+        wait.until(ExpectedConditions.titleContains("Quotes"));
 
         System.out.println("✅ Wait Commands passed");
     }
@@ -264,9 +254,8 @@ public class SeleniumCommandsTest {
     // TEST 5: Keyboard & Mouse Action Commands
     // Purpose: Simulate advanced user interactions like hover, drag, key combinations
     // ─────────────────────────────────────────────────────────────────────────────
-    @Test
-    @Order(5)
-    void testKeyboardMouseActions() {
+    @Test(priority = 5)
+    public void testKeyboardMouseActions() {
         // Use DuckDuckGo — no consent popup, search box reliably available
         driver.get("https://duckduckgo.com");
 
@@ -309,10 +298,9 @@ public class SeleniumCommandsTest {
     // TEST 6: Cookies Management Commands
     // Purpose: Add, retrieve, and delete browser cookies to manage session data
     // ─────────────────────────────────────────────────────────────────────────────
-    @Test
-    @Order(6)
-    void testCookiesManagement() {
-        driver.get("https://www.example.com");
+    @Test(priority = 6)
+    public void testCookiesManagement() {
+        driver.get("https://www.bing.com");
 
         // driver.manage().addCookie(): adds a new cookie to the current browser session
         // Cookies are used to store session tokens, user preferences, tracking data, etc.
@@ -322,26 +310,26 @@ public class SeleniumCommandsTest {
         // driver.manage().getCookieNamed(): retrieves a specific cookie by its name
         // Returns null if the cookie does not exist
         Cookie cookie = driver.manage().getCookieNamed("testCookie");
-        assertNotNull(cookie); // Verify the cookie was added successfully
+        Assert.assertNotNull(cookie); // Verify the cookie was added successfully
 
         // cookie.getValue(): returns the value stored in the cookie
-        assertEquals("testValue", cookie.getValue());
+        Assert.assertEquals(cookie.getValue(), "testValue");
 
         // driver.manage().getCookies(): returns a Set of ALL cookies for the current domain
         // Used to inspect all active cookies in the session
-        assertFalse(driver.manage().getCookies().isEmpty());
+        Assert.assertFalse(driver.manage().getCookies().isEmpty());
 
         // driver.manage().deleteCookieNamed(): deletes a specific cookie by name
         // Used to log out users or clear specific session data
         driver.manage().deleteCookieNamed("testCookie");
 
         // Verify the cookie was deleted — getCookieNamed returns null if not found
-        assertNull(driver.manage().getCookieNamed("testCookie"));
+        Assert.assertNull(driver.manage().getCookieNamed("testCookie"));
 
         // driver.manage().deleteAllCookies(): deletes ALL cookies for the current domain
         // Used to reset browser state between tests or simulate a fresh session
         driver.manage().deleteAllCookies();
-        assertTrue(driver.manage().getCookies().isEmpty());
+        Assert.assertTrue(driver.manage().getCookies().isEmpty());
 
         System.out.println("✅ Cookies Management Commands passed");
     }
@@ -351,10 +339,9 @@ public class SeleniumCommandsTest {
     // Purpose: Run JavaScript directly in the browser to interact with the page
     //          beyond what standard Selenium commands allow
     // ─────────────────────────────────────────────────────────────────────────────
-    @Test
-    @Order(7)
-    void testJavaScriptExecution() {
-        driver.get("https://www.example.com");
+    @Test(priority = 7)
+    public void testJavaScriptExecution() {
+        driver.get("https://www.selenium.dev");
 
         // JavascriptExecutor: interface that allows executing JavaScript code in the browser
         // We cast the WebDriver to JavascriptExecutor to access executeScript()
@@ -364,7 +351,7 @@ public class SeleniumCommandsTest {
         // "return document.title" — gets the page title via JavaScript
         // Useful when Selenium's getTitle() is not sufficient or for custom JS interactions
         String title = (String) js.executeScript("return document.title");
-        assertEquals("Example Domain", title);
+        Assert.assertTrue(title.contains("Selenium"));
 
         // Scroll to the bottom of the page using JavaScript
         // window.scrollTo(x, y): scrolls to the given coordinates
@@ -379,7 +366,7 @@ public class SeleniumCommandsTest {
         // Get the current URL using JavaScript
         // "return window.location.href" — returns the full URL of the current page
         String url = (String) js.executeScript("return window.location.href");
-        assertTrue(url.contains("example.com"));
+        Assert.assertTrue(url.contains("selenium.dev"));
 
         // Highlight an element by changing its CSS border using JavaScript
         // arguments[0] refers to the first argument passed after the script (the WebElement)
@@ -400,10 +387,9 @@ public class SeleniumCommandsTest {
     // TEST 8: Screen Capture Commands
     // Purpose: Take screenshots of the browser to capture test evidence or debug failures
     // ─────────────────────────────────────────────────────────────────────────────
-    @Test
-    @Order(8)
-    void testScreenCapture() {
-        driver.get("https://www.example.com");
+    @Test(priority = 8)
+    public void testScreenCapture() {
+        driver.get("https://www.wikipedia.org");
 
         // TakesScreenshot: interface that provides screenshot capability
         // We cast WebDriver to TakesScreenshot to access getScreenshotAs()
@@ -412,13 +398,13 @@ public class SeleniumCommandsTest {
         // OutputType.BASE64: captures the screenshot as a Base64-encoded string
         // Useful for embedding screenshots in HTML reports or sending via API
         String base64 = ts.getScreenshotAs(OutputType.BASE64);
-        assertNotNull(base64);
-        assertFalse(base64.isEmpty());
+        Assert.assertNotNull(base64);
+        Assert.assertFalse(base64.isEmpty());
 
         // OutputType.BYTES: captures the screenshot as a raw byte array
         // Useful for saving to a file or processing the image programmatically
         byte[] bytes = ts.getScreenshotAs(OutputType.BYTES);
-        assertTrue(bytes.length > 0); // Verify screenshot data was captured
+        Assert.assertTrue(bytes.length > 0); // Verify screenshot data was captured
 
         System.out.println("✅ Screen Capture Commands passed");
     }
@@ -427,9 +413,8 @@ public class SeleniumCommandsTest {
     // TEST 9: Session & Timeout Commands
     // Purpose: Configure WebDriver session settings and verify session information
     // ─────────────────────────────────────────────────────────────────────────────
-    @Test
-    @Order(9)
-    void testSessionAndTimeouts() {
+    @Test(priority = 9)
+    public void testSessionAndTimeouts() {
 
         // implicitlyWait: sets a global wait time for finding elements
         // WebDriver will poll the DOM for up to 5 seconds before throwing NoSuchElementException
@@ -444,21 +429,21 @@ public class SeleniumCommandsTest {
         // Used with driver.executeAsyncScript() — prevents scripts from hanging indefinitely
         driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10));
 
-        driver.get("https://www.example.com");
+        driver.get("https://quotes.toscrape.com");
 
         // driver.getPageSource(): returns the complete HTML source code of the current page
         // Useful for verifying page content without interacting with DOM elements
         String source = driver.getPageSource();
-        assertTrue(source.contains("Example Domain"));
+        Assert.assertTrue(source.contains("Quotes"));
 
         // driver.getWindowHandle(): returns the unique identifier (handle) of the current window
         // Each browser tab/window has a unique handle — used to switch between windows
         String handle = driver.getWindowHandle();
-        assertNotNull(handle); // Verify a valid handle was returned
+        Assert.assertNotNull(handle); // Verify a valid handle was returned
 
         // driver.getWindowHandles(): returns handles of ALL open windows/tabs
         // Returns a Set<String> — each string is a unique window handle
-        assertFalse(driver.getWindowHandles().isEmpty());
+        Assert.assertFalse(driver.getWindowHandles().isEmpty());
 
         System.out.println("✅ Session & Timeout Commands passed");
     }

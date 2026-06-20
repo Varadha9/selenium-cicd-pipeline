@@ -3,7 +3,7 @@
 ![Build Status](https://github.com/Varadha9/selenium-cicd-pipeline/actions/workflows/selenium-ci.yml/badge.svg)
 ![Java](https://img.shields.io/badge/Java-11-orange)
 ![Selenium](https://img.shields.io/badge/Selenium-4.18.1-green)
-![JUnit](https://img.shields.io/badge/JUnit-5.10.2-blue)
+![TestNG](https://img.shields.io/badge/TestNG-7.9.0-blue)
 ![Maven](https://img.shields.io/badge/Maven-3.x-red)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
@@ -98,7 +98,7 @@ This is the industry-standard approach used by QA Engineers and DevOps teams to 
 |-------|------------------|---------|---------|
 | Language | Java | 11 | Primary programming language |
 | Build Tool | Apache Maven | 3.x | Dependency management and build |
-| Test Framework | JUnit 5 (Jupiter) | 5.10.2 | Test lifecycle and assertions |
+| Test Framework | TestNG | 7.9.0 | Test lifecycle, ordering, and assertions |
 | Browser Automation | Selenium WebDriver | 4.18.1 | Browser control and interaction |
 | Driver Management | WebDriverManager | 5.7.0 | Auto-downloads ChromeDriver |
 | Browser | Google Chrome | Latest | Browser under test |
@@ -126,6 +126,7 @@ selenium-cicd-pipeline/
 ├── target/                                     ← Maven build output (auto-generated, not in Git)
 │   └── surefire-reports/                       ← Test execution reports
 │
+├── testng.xml                                  ← TestNG suite configuration
 ├── pom.xml                                     ← Maven project config & dependencies
 ├── .gitignore                                  ← Files excluded from Git
 └── README.md                                   ← This file
@@ -135,7 +136,8 @@ selenium-cicd-pipeline/
 
 - **`SeleniumCommandsTest.java`** — Contains all 9 test methods covering every major Selenium command category. Each method is fully commented explaining what each command does and why it is used.
 - **`selenium-ci.yml`** — Defines the GitHub Actions workflow. Triggers on push/PR to main, sets up Java + Chrome, and runs `mvn test`.
-- **`pom.xml`** — Maven configuration file. Declares Selenium, WebDriverManager, and JUnit 5 as dependencies.
+- **`testng.xml`** — TestNG suite file that registers the test class and controls execution.
+- **`pom.xml`** — Maven configuration file. Declares Selenium, WebDriverManager, and TestNG as dependencies.
 - **`.gitignore`** — Excludes `target/` and `.class` files from being committed to Git.
 
 ---
@@ -218,7 +220,7 @@ mvn test -B
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
-Running tests.SeleniumCommandsTest
+Running TestSuite
 
 ✅ Browser & Navigation Commands passed
 ✅ Window Management Commands passed
@@ -231,7 +233,7 @@ Running tests.SeleniumCommandsTest
 ✅ Session & Timeout Commands passed
 
 Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
-Time elapsed: ~65 seconds
+Time elapsed: ~20 seconds
 
 BUILD SUCCESS
 ```
@@ -248,49 +250,49 @@ target/surefire-reports/
 
 | # | Test Method | Website Used | Selenium Commands Covered |
 |---|-------------|-------------|--------------------------|
-| 1 | `testBrowserNavigation` | example.com, wikipedia.org | `get()`, `getTitle()`, `getCurrentUrl()`, `navigate().to()`, `navigate().back()`, `navigate().forward()`, `navigate().refresh()` |
-| 2 | `testWindowManagement` | example.com, wikipedia.org | `maximize()`, `setSize()`, `setPosition()`, `getSize()`, `getWindowHandle()`, `getWindowHandles()`, `switchTo().newWindow()`, `switchTo().window()`, `close()` |
+| 1 | `testBrowserNavigation` | github.com, wikipedia.org | `get()`, `getTitle()`, `getCurrentUrl()`, `navigate().to()`, `navigate().back()`, `navigate().forward()`, `navigate().refresh()` |
+| 2 | `testWindowManagement` | selenium.dev, bing.com | `maximize()`, `setSize()`, `setPosition()`, `getSize()`, `getWindowHandle()`, `getWindowHandles()`, `switchTo().newWindow()`, `switchTo().window()`, `close()` |
 | 3 | `testElementInteraction` | duckduckgo.com | `findElement(By.name())`, `findElement(By.cssSelector())`, `sendKeys()`, `clear()`, `getAttribute()`, `Keys.ENTER` |
-| 4 | `testWaitCommands` | example.com | `implicitlyWait()`, `WebDriverWait`, `visibilityOfElementLocated()`, `elementToBeClickable()`, `titleIs()` |
+| 4 | `testWaitCommands` | quotes.toscrape.com | `implicitlyWait()`, `WebDriverWait`, `visibilityOfElementLocated()`, `elementToBeClickable()`, `titleContains()` |
 | 5 | `testKeyboardMouseActions` | duckduckgo.com | `Actions`, `moveToElement()`, `click()`, `doubleClick()`, `keyDown()`, `keyUp()`, `sendKeys()`, `perform()` |
-| 6 | `testCookiesManagement` | example.com | `addCookie()`, `getCookieNamed()`, `getCookies()`, `deleteCookieNamed()`, `deleteAllCookies()` |
-| 7 | `testJavaScriptExecution` | example.com | `JavascriptExecutor`, `executeScript()`, scroll, highlight element, JS click |
-| 8 | `testScreenCapture` | example.com | `TakesScreenshot`, `getScreenshotAs(BASE64)`, `getScreenshotAs(BYTES)` |
-| 9 | `testSessionAndTimeouts` | example.com | `implicitlyWait()`, `pageLoadTimeout()`, `scriptTimeout()`, `getPageSource()`, `getWindowHandle()`, `getWindowHandles()` |
+| 6 | `testCookiesManagement` | bing.com | `addCookie()`, `getCookieNamed()`, `getCookies()`, `deleteCookieNamed()`, `deleteAllCookies()` |
+| 7 | `testJavaScriptExecution` | selenium.dev | `JavascriptExecutor`, `executeScript()`, scroll, highlight element, JS click |
+| 8 | `testScreenCapture` | wikipedia.org | `TakesScreenshot`, `getScreenshotAs(BASE64)`, `getScreenshotAs(BYTES)` |
+| 9 | `testSessionAndTimeouts` | quotes.toscrape.com | `implicitlyWait()`, `pageLoadTimeout()`, `scriptTimeout()`, `getPageSource()`, `getWindowHandle()`, `getWindowHandles()` |
 
 ---
 
 ## Detailed Test Descriptions
 
 ### Test 1 — Browser & Navigation Commands
-**Purpose:** Verify basic browser navigation — opening URLs, reading page info, and using browser history.
+**Purpose:** Verify basic browser navigation — opening URLs, reading page info, and using browser history.  
+**Website:** github.com → wikipedia.org
 
-- Opens `example.com` and verifies the page title and URL
+- Opens `github.com` and verifies the title contains "GitHub" and URL contains "github.com"
 - Navigates to `wikipedia.org` using `navigate().to()`
-- Goes back to `example.com` using `navigate().back()`
+- Goes back to `github.com` using `navigate().back()`
 - Goes forward to `wikipedia.org` using `navigate().forward()`
 - Reloads the page using `navigate().refresh()`
 
 ---
 
 ### Test 2 — Window Management Commands
-**Purpose:** Demonstrate how to manage multiple browser windows and tabs.
+**Purpose:** Demonstrate how to manage multiple browser windows and tabs.  
+**Website:** selenium.dev (parent) + bing.com (child tab)
 
-- Maximizes the browser window
+- Opens `selenium.dev` and maximizes the browser window
 - Gets and verifies the window size
-- Resizes the window to 1280x720
-- Moves the window to position (0,0)
+- Resizes the window to 1280x720 and moves it to position (0,0)
 - Saves the parent window handle
-- Opens a new tab with `switchTo().newWindow(WindowType.TAB)`
-- Opens Wikipedia in the new tab
+- Opens a new tab with `switchTo().newWindow(WindowType.TAB)` and navigates to `bing.com`
 - Loops through all window handles to find the child tab
-- Closes the child tab with `close()`
-- Switches back to the parent window
+- Closes the child tab and switches back to the parent window
 
 ---
 
 ### Test 3 — Element Interaction Commands
-**Purpose:** Find elements on the page and interact with them.
+**Purpose:** Find elements on the page and interact with them.  
+**Website:** duckduckgo.com
 
 - Opens DuckDuckGo (no consent popup — reliable search box)
 - Waits for the search box to be visible
@@ -299,25 +301,27 @@ target/surefire-reports/
 - Clears the field using `clear()`
 - Finds the same element using CSS selector
 - Types "Java Selenium" and presses Enter
-- Waits for and verifies the search results page title
+- Waits for and verifies the search results page title contains "Java Selenium"
 
 ---
 
 ### Test 4 — Wait Commands
-**Purpose:** Demonstrate implicit and explicit waits for handling dynamic content.
+**Purpose:** Demonstrate implicit and explicit waits for handling dynamic content.  
+**Website:** quotes.toscrape.com
 
 - Uses `WebDriverWait` with `ExpectedConditions.visibilityOfElementLocated()` to wait for the `<h1>` heading
 - Verifies the heading is displayed using `isDisplayed()`
 - Uses `elementToBeClickable()` to wait for a link to be ready
-- Uses `titleIs()` to wait for an exact page title match
+- Uses `titleContains("Quotes")` to wait for the page title to match
 
 ---
 
 ### Test 5 — Keyboard & Mouse Action Commands
-**Purpose:** Simulate advanced user interactions using the Actions API.
+**Purpose:** Simulate advanced user interactions using the Actions API.  
+**Website:** duckduckgo.com
 
 - Creates an `Actions` instance for advanced interactions
-- Uses `moveToElement().click().perform()` to hover and click
+- Uses `moveToElement().click().perform()` to hover and click the search box
 - Types text using `actions.sendKeys()`
 - Simulates Ctrl+A (select all) using `keyDown(CONTROL).sendKeys("a").keyUp(CONTROL)`
 - Deletes selected text using `Keys.DELETE`
@@ -326,7 +330,8 @@ target/surefire-reports/
 ---
 
 ### Test 6 — Cookies Management Commands
-**Purpose:** Add, retrieve, and delete browser cookies.
+**Purpose:** Add, retrieve, and delete browser cookies.  
+**Website:** bing.com
 
 - Adds a cookie named "testCookie" with value "testValue"
 - Retrieves the cookie by name and verifies its value
@@ -337,20 +342,22 @@ target/surefire-reports/
 ---
 
 ### Test 7 — JavaScript Execution Commands
-**Purpose:** Execute JavaScript directly in the browser for interactions beyond standard Selenium.
+**Purpose:** Execute JavaScript directly in the browser for interactions beyond standard Selenium.  
+**Website:** selenium.dev
 
 - Casts WebDriver to `JavascriptExecutor`
-- Gets the page title via `executeScript("return document.title")`
+- Gets the page title via `executeScript("return document.title")` and verifies it contains "Selenium"
 - Scrolls to the bottom of the page
 - Scrolls back to the top
-- Gets the current URL via JavaScript
+- Gets the current URL via JavaScript and verifies it contains "selenium.dev"
 - Highlights the `<h1>` element with a red border
 - Clicks a link using JavaScript (bypasses normal click restrictions)
 
 ---
 
 ### Test 8 — Screen Capture Commands
-**Purpose:** Take screenshots for test evidence and debugging.
+**Purpose:** Take screenshots for test evidence and debugging.  
+**Website:** wikipedia.org
 
 - Casts WebDriver to `TakesScreenshot`
 - Captures screenshot as Base64 string (for HTML reports / APIs)
@@ -360,12 +367,13 @@ target/surefire-reports/
 ---
 
 ### Test 9 — Session & Timeout Commands
-**Purpose:** Configure WebDriver session timeouts and verify session information.
+**Purpose:** Configure WebDriver session timeouts and verify session information.  
+**Website:** quotes.toscrape.com
 
 - Sets `implicitlyWait` to 5 seconds (global element wait)
 - Sets `pageLoadTimeout` to 30 seconds (max page load time)
 - Sets `scriptTimeout` to 10 seconds (max async JS execution time)
-- Gets and verifies the full HTML page source
+- Gets and verifies the full HTML page source contains "Quotes"
 - Gets and verifies the current window handle
 - Gets and verifies all open window handles
 
@@ -488,7 +496,7 @@ Developer pushes code to GitHub
 | Explicit Wait | `new WebDriverWait(driver, Duration.ofSeconds(10))` | Wait for specific condition |
 | Visibility | `ExpectedConditions.visibilityOfElementLocated(By)` | Element must be visible |
 | Clickable | `ExpectedConditions.elementToBeClickable(By)` | Element must be clickable |
-| Title | `ExpectedConditions.titleIs("Page Title")` | Wait for exact page title |
+| Title Contains | `ExpectedConditions.titleContains("text")` | Wait for title to contain text |
 | URL | `ExpectedConditions.urlContains("keyword")` | Wait for URL to contain text |
 
 ### Window Management
@@ -520,8 +528,8 @@ rmdir /s /q %USERPROFILE%\.wdm
 ```
 Then run `mvn test` again — WebDriverManager will download the correct version.
 
-### `NoSuchElementException` on Google
-Google shows a cookie consent popup in some regions that blocks the search box. This project uses **DuckDuckGo** for element interaction tests to avoid this issue.
+### `NoSuchElementException` on DuckDuckGo
+If DuckDuckGo changes its layout, update the locator from `By.name("q")` to `By.id("searchbox_input")`.
 
 ### Tests pass locally but fail in CI
 Check that the CI workflow installs the same Chrome version. The `browser-actions/setup-chrome@v1` action installs the latest stable Chrome — same as WebDriverManager downloads.
@@ -561,4 +569,4 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 ---
 
-*Built with Java + Selenium WebDriver + JUnit 5 + GitHub Actions*
+*Built with Java + Selenium WebDriver + TestNG + GitHub Actions*
