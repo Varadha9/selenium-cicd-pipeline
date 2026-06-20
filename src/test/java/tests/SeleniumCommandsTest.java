@@ -188,8 +188,7 @@ public class SeleniumCommandsTest {
     // ─────────────────────────────────────────────────────────────────────────────
     @Test(priority = 3)
     public void testElementInteraction() {
-        // Use DuckDuckGo instead of Google — no consent popup, search box always available
-        // Google sometimes shows a cookie/consent page that blocks the search box
+        // Google shows consent popups in some regions — DuckDuckGo has no popup, search box always accessible
         driver.get("https://duckduckgo.com");
 
         // Explicit wait: waits until the search box is visible before interacting
@@ -265,7 +264,7 @@ public class SeleniumCommandsTest {
     // ─────────────────────────────────────────────────────────────────────────────
     @Test(priority = 5)
     public void testKeyboardMouseActions() {
-        // Use DuckDuckGo — no consent popup, search box reliably available
+        // Google shows consent popups in some regions — DuckDuckGo has no popup, search box always accessible
         driver.get("https://duckduckgo.com");
 
         // Actions class: used for complex user interactions that go beyond simple click/type
