@@ -91,15 +91,15 @@ public class SeleniumCommandsTest {
 
         // driver.get(): opens the specified URL in the current browser window
         // This is the most basic browser command — equivalent to typing a URL in the address bar
-        driver.get("https://github.com");
+        driver.get("https://www.google.com");
 
         // driver.getTitle(): returns the title of the current page (text in the browser tab)
         // We use assertTrue to verify the page loaded correctly
-        Assert.assertTrue(driver.getTitle().contains("GitHub"));
+        Assert.assertTrue(driver.getTitle().contains("Google"));
 
         // driver.getCurrentUrl(): returns the full URL of the current page
         // Useful to verify redirects or that the correct page is loaded
-        Assert.assertTrue(driver.getCurrentUrl().contains("github.com"));
+        Assert.assertTrue(driver.getCurrentUrl().contains("google.com"));
 
         // driver.navigate().to(): navigates to a new URL — similar to driver.get()
         // The difference: navigate().to() is part of the Navigation interface and supports history
@@ -126,7 +126,7 @@ public class SeleniumCommandsTest {
     // ─────────────────────────────────────────────────────────────────────────────
     @Test(priority = 2)
     public void testWindowManagement() {
-        driver.get("https://www.selenium.dev");
+        driver.get("https://www.wikipedia.org");
 
         // driver.manage().window().maximize(): maximizes the browser window to fill the screen
         // Used to ensure elements are visible and not hidden due to small window size
@@ -154,7 +154,7 @@ public class SeleniumCommandsTest {
         driver.switchTo().newWindow(WindowType.TAB);
 
         // Open a different website in the new tab (child window)
-        driver.get("https://www.bing.com");
+        driver.get("https://www.youtube.com");
 
         // driver.getWindowHandles(): returns a Set of all open window/tab handles
         // We use this to find the child window handle
@@ -350,7 +350,7 @@ public class SeleniumCommandsTest {
     // ─────────────────────────────────────────────────────────────────────────────
     @Test(priority = 7)
     public void testJavaScriptExecution() {
-        driver.get("https://www.selenium.dev");
+        driver.get("https://www.wikipedia.org");
 
         // JavascriptExecutor: interface that allows executing JavaScript code in the browser
         // We cast the WebDriver to JavascriptExecutor to access executeScript()
@@ -360,7 +360,7 @@ public class SeleniumCommandsTest {
         // "return document.title" — gets the page title via JavaScript
         // Useful when Selenium's getTitle() is not sufficient or for custom JS interactions
         String title = (String) js.executeScript("return document.title");
-        Assert.assertTrue(title.contains("Selenium"));
+        Assert.assertTrue(title.contains("Wikipedia"));
 
         // Scroll to the bottom of the page using JavaScript
         // window.scrollTo(x, y): scrolls to the given coordinates
@@ -375,7 +375,7 @@ public class SeleniumCommandsTest {
         // Get the current URL using JavaScript
         // "return window.location.href" — returns the full URL of the current page
         String url = (String) js.executeScript("return window.location.href");
-        Assert.assertTrue(url.contains("selenium.dev"));
+        Assert.assertTrue(url.contains("wikipedia.org"));
 
         // Highlight an element by changing its CSS border using JavaScript
         // arguments[0] refers to the first argument passed after the script (the WebElement)
