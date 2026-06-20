@@ -300,7 +300,7 @@ public class SeleniumCommandsTest {
     // ─────────────────────────────────────────────────────────────────────────────
     @Test(priority = 6)
     public void testCookiesManagement() {
-        driver.get("https://www.bing.com");
+        driver.get("https://quotes.toscrape.com");
 
         // driver.manage().addCookie(): adds a new cookie to the current browser session
         // Cookies are used to store session tokens, user preferences, tracking data, etc.
